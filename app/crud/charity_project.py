@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import List, Optional, Union
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
 from app.models.charity_project import CharityProject
+from app.schemas.charity_project import CharityProjectDB
 
 
 class CRUDCharityProject(CRUDBase):
@@ -22,6 +23,20 @@ class CRUDCharityProject(CRUDBase):
             )
         )
         return project_id.scalars().first()
+
+    async def get_projects_by_completion_rate(
+            self,
+            session: AsyncSession,
+    ) -> Union[None, List[CharityProjectDB]]:
+        """Запрос на все завершённые проекты."""
+
+        projects = await session.execute(
+            select(CharityProject).where(
+                CharityProject.fully_invested
+            )
+        )
+        projects = projects.scalars().all()
+        return projects.sort(key=lambda x: x.close_date - x.create_date)
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)
