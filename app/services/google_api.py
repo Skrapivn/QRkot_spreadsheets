@@ -1,10 +1,8 @@
 from datetime import datetime
-from typing import List
 
 from aiogoogle import Aiogoogle
 
 from app.core.config import settings
-from app.schemas.charity_project import CharityProjectDB
 
 
 FORMAT = "%Y/%m/%d %H:%M:%S"
@@ -25,8 +23,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
-    spreadsheetid = response['spreadsheetId']
-    return spreadsheetid
+    return response['spreadsheetId']
 
 
 async def set_user_permissions(
@@ -47,7 +44,7 @@ async def set_user_permissions(
 
 async def spreadsheets_update_value(
         spreadsheetid: str,
-        projects: List[CharityProjectDB],
+        projects: list,
         wrapper_services: Aiogoogle
 ) -> None:
     now_date_time = datetime.now().strftime(FORMAT)
@@ -59,11 +56,10 @@ async def spreadsheets_update_value(
         ['Название проекта', 'Время сбора', 'Описание']
     ]
     for object in projects:
-        sorted = object['close_date'] - object['create_date']
         new_row = [
-            str(object['name']),
-            str(sorted),
-            str(object['description'])
+            object.name,
+            str(object.close_date - object.create_date),
+            object.description
         ]
         table_values.append(new_row)
 
