@@ -65,7 +65,7 @@ uvicorn app.main:app --reload --port 5000
 http://127.0.0.1:8000/docs
 ```
 
-# Обновление добавлено API google
+# Upd: + API google
 
 Добавлены  ключи, в файле .env.example:
 
